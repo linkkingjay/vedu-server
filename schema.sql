@@ -1,15 +1,24 @@
+DROP TABLE IF EXISTS "Tech";
+DROP TABLE IF EXISTS "Links";
+DROP TABLE IF EXISTS "Tech_then";
 CREATE TABLE Tech (
-    tech_id      SERIAL PRIMARY KEY,    
+    tech_id      INTEGER PRIMARY KEY AUTO_INCREMENT,    
+    name         VARCHAR(50),
     description  VARCHAR(500),
-    then_id      BIGINT UNSIGNED NOT NULL,
-    home         VARCHAR(200),
-    FOEIGN KEY (then_id) REFERENCES Tech(tech_id)
+    home         VARCHAR(200)
 );
 
 CREATE TABLE Links (
-    link_id     SERIAL PRIMARY KEY,    
+    link_id     INTEGER PRIMARY KEY AUTO_INCREMENT,    
     tech_id     BIGINT UNSIGNED NOT NULL,
     name        VARCHAR(30),
     url         VARCHAR(500), 
-    FOEIGN KEY (tech_id) REFERENCES Tech(tech_id)
+    FOREIGN KEY (tech_id) REFERENCES Tech(tech_id)
+);
+
+CREATE TABLE Tech_then (
+    tech_id      BIGINT UNSIGNED NOT NULL,
+    then_id      BIGINT UNSIGNED NOT NULL,
+    FOREIGN KEY (tech_id) REFERENCES Tech(tech_id),
+    FOREIGN KEY (then_id) REFERENCES Tech(tech_id)
 );
