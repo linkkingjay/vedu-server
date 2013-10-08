@@ -30,7 +30,7 @@ function get_techs() {
  * @return new record array
  */
 function create_tech($name, $description, $homepage) {
-    return create_record('Tech', array(
+    return create_record('Tech', 'tech_id', array(
         'name' => $name,
         'description' => $description,
         'home' => $homepage

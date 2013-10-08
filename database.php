@@ -81,9 +81,10 @@ function get_all_records($table) {
  *
  * @param $table table name
  * @param $values new record's value
+ * @param $primary_key table's primary key
  * @return new record array
  */
-function create_record($table, $values) {
+function create_record($table, $primary_key, $values) {
     $conn = get_connection();
 
     $k1 = array();
@@ -101,7 +102,7 @@ function create_record($table, $values) {
 
     $conn->close();
 
-    return get_record_by_id($id);
+    return get_record_by_id($table, $primary_key, $id);
 }
 
 /**
