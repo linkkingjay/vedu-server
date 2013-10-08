@@ -1,7 +1,6 @@
 <?php if (!defined('CODENAME')) exit('No direct script access allowed');
 
 require('database.php');
-require_once('utils.php');
 
 /**
  * get a tech term by id
@@ -10,19 +9,7 @@ require_once('utils.php');
  * @return array if it was found otherwise NULL
  */
 function get_tech_by_id($id) {
-    $conn = get_connection();
-
-    $query = $conn->prepare('SELECT * FROM Tech WHERE tech_id = :id');
-    $query->bindValue(':id', $id);
-    $result = $query->execute();
-
-    if ($result) {
-        $result = $result->fetchArray();
-    }
-
-    $conn->close();
-
-    return $result;
+    return get_record_by_id('Tech', 'tech_id', $id);
 }
 
 /**
@@ -31,18 +18,7 @@ function get_tech_by_id($id) {
  * @return records array
  */
 function get_techs() {
-    $conn = get_connection();
-
-    $results = array();
-    $query = $conn->query('SELECT * FROM Tech');
-
-    while ($result = $query->fetchArray()) {
-        $results[] = $result;
-    }
-
-    $conn->close();
-
-    return $results;
+    return get_all_records('Tech');
 }
 
 /**
@@ -54,34 +30,20 @@ function get_techs() {
  * @return new record array
  */
 function create_tech($name, $description, $homepage) {
-    $conn = get_connection();
-
-    $insert = $conn->prepare('INSERT INTO Tech (name, description, home) ' .
-                             'VALUES (:name, :description, :home)');
-    $insert = batch_bind_value($insert, array(
+    return create_record('Tech', array(
         'name' => $name,
         'description' => $description,
         'home' => $homepage
     ));
-    $result = $insert->execute();
-
-    $id = $conn->lastInsertRowid();
-    
-    $conn->close();
-
-    return get_tech_by_id($id);
 }
 
+/**
+ * update a tech term
+ *
+ * @param $id tech's id
+ * @param $values tech's new values
+ * @return updated record array
+ */
 function update_tech($id, $values) {
-    $conn = get_connection();
-
-    $query = $conn->prepare('UPDATE Tech SET ' . build_update_params($values) .
-                            ' WHERE tech_id = :id');
-    $values['id'] = $id;
-    $query = batch_bind_value($query, $values);
-    $result = $query->execute();
-
-    $conn->close();
-
-    return get_tech_by_id($id);
+    return update_record('Tech', 'tech_id', $id, $values);
 }

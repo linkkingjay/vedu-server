@@ -1,15 +1,135 @@
 <?php if (!defined('CODENAME')) exit('No direct script access allowed');
 
-require_once('config.inc');
+// check for DB settings
+if (!defined('DB_NAME')) exit('No direct script access allowed');
+
+/**
+ * bind value to prepared sql query batchly
+ *
+ * @param $prepare prepared sql query
+ * @param $items associate array
+ * @return value binded sql query
+ */
+function batch_bind_value($prepare, $items) {
+    foreach ($items as $k => $v) {
+        $prepare->bindValue(':' . $k, $v);
+    }
+
+    return $prepare;
+}
 
 /**
  * create a conn cursor
  *
- * don't forget to close after using
+ * XXX don't forget to close after using
  *
  * @return sqlite3 connection
  */
 function get_connection() {
     $connection = new SQLite3(DB_NAME) or die('cannot open database');
     return $connection;
+}
+
+/**
+ * get record from database
+ *
+ * @param $table table name
+ * @param $primary_key table primary key's name
+ * @param $id record's id
+ * @return array if it was found otherwise NULL
+ */
+function get_record_by_id($table, $primary_key, $id) {
+    $conn = get_connection();
+
+    $query = $conn->prepare(
+        'SELECT * FROM ' . $table . ' WHERE ' . $primary_key . ' = :id');
+    $query->bindValue(':id', $id);
+    $result = $query->execute();
+
+    if ($result) {
+        $result = $result->fetchArray();
+    }
+
+    $conn->close();
+
+    return $result;
+}
+
+/**
+ * get all records from database
+ *
+ * @param $table table name
+ * @return records array
+ */
+function get_all_records($table) {
+    $conn = get_connection();
+
+    $results = array();
+    $query = $conn->query('SELECT * FROM ' . $table);
+
+    while ($result = $query->fetchArray()) {
+        $results[] = $result;
+    }
+
+    $conn->close();
+
+    return $results;
+}
+
+/**
+ * create a record
+ *
+ * @param $table table name
+ * @param $values new record's value
+ * @return new record array
+ */
+function create_record($table, $values) {
+    $conn = get_connection();
+
+    $k1 = array();
+    $k2 = array();
+    foreach ($values as $k => $v) {
+        $k1[] = $k;
+        $k2[] = ':' . $k;
+    }
+    $insert = $conn->prepare('INSERT INTO ' . $table .
+        '(' . implode($k1, ',') . ') VALUES' .
+        '(' . implode($k2, ',') . ')' );
+    $insert = batch_bind_value($insert, $values);
+    $result = $insert->execute();
+    $id = $conn->lastInsertRowid();
+
+    $conn->close();
+
+    return get_record_by_id($id);
+}
+
+/**
+ * update a record
+ *
+ * @param $table table name
+ * @param $primary_key table primary key's name
+ * @param $id record's id
+ * @param $values values to be updated
+ * @return record array
+ */
+function update_record($table, $primary_key, $id, $values) {
+    $conn = get_connection();
+
+    $params = array();
+    foreach ($values as $k => $v) {
+        $params[] = $k . ' = :' . $k;
+    }
+
+    $query = $conn->prepare('UPDATE ' . $table .
+        ' SET ' . implode($params, ',') .
+        ' WHERE ' . $primary_key . ' = :id');
+    $values['id'] = $id;
+    $query = batch_bind_value($query, $values);
+
+    $result = $query->execute();
+
+    $conn->close();
+
+    return get_record_by_id($table, $primary_key, $id);
 }
