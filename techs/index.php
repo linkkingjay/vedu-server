@@ -1,7 +1,7 @@
 <?php
 
-require_once('config.inc');
-require_once('models.php');
+require_once('../config.inc');
+require_once('../models.php');
 
 $techs = array();
 foreach (get_techs() as $tech) {
