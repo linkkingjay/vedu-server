@@ -82,9 +82,9 @@ function get_all_records($table) {
  * @param $table table name
  * @param $values new record's value
  * @param $primary_key table's primary key
- * @return new record array
+ * @return new record array if $primary_key is provided
  */
-function create_record($table, $primary_key, $values) {
+function create_record($table, $values, $primary_key=null) {
     $conn = get_connection();
 
     $k1 = array();
@@ -98,11 +98,18 @@ function create_record($table, $primary_key, $values) {
         '(' . implode($k2, ',') . ')' );
     $insert = batch_bind_value($insert, $values);
     $result = $insert->execute();
-    $id = $conn->lastInsertRowid();
+
+    if ($primary_key) {
+        $id = $conn->lastInsertRowid();
+    }
 
     $conn->close();
 
-    return get_record_by_id($table, $primary_key, $id);
+    if ($primary_key) {
+        return get_record_by_id($table, $primary_key, $id);
+    }
+
+    return null;
 }
 
 /**
@@ -133,4 +140,23 @@ function update_record($table, $primary_key, $id, $values) {
     $conn->close();
 
     return get_record_by_id($table, $primary_key, $id);
+}
+
+/**
+ * remove a record
+ *
+ * @param $table table name
+ * @param $primary_key table's primary key's name
+ * @param $id record's id
+ * @return null
+ */
+function remove_record($table, $primary_key, $id) {
+    $conn = get_connection();
+
+    $remove = $conn->prepare('DELETE FROM ' . $table .
+        ' WHERE ' . $primary_key . ' = :id');
+    $remove->bindValue(':id', $id);
+    $remove->execute();
+
+    $conn->close();
 }
