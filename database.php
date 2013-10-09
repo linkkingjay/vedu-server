@@ -19,6 +19,22 @@ function batch_bind_value($prepare, $items) {
 }
 
 /**
+ * remove sql record array's integer index
+ *
+ * @param $array raw sql record array
+ * @return record array
+ */
+function clean_fetch_record($array) {
+    $cleaned = array();
+    foreach ($array as $k => $v) {
+        if (gettype($k) === 'string') {
+            $cleaned[$k] = $v;
+        }
+    }
+    return $cleaned;
+}
+
+/**
  * create a conn cursor
  *
  * XXX don't forget to close after using
@@ -47,7 +63,7 @@ function get_record_by_id($table, $primary_key, $id) {
     $result = $query->execute();
 
     if ($result) {
-        $result = $result->fetchArray();
+        $result = clean_fetch_record($result->fetchArray());
     }
 
     $conn->close();
@@ -68,7 +84,7 @@ function get_all_records($table) {
     $query = $conn->query('SELECT * FROM ' . $table);
 
     while ($result = $query->fetchArray()) {
-        $results[] = $result;
+        $results[] = clean_fetch_record($result);
     }
 
     $conn->close();
