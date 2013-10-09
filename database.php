@@ -27,7 +27,7 @@ function batch_bind_value($prepare, $items) {
 function clean_fetch_record($array) {
     $cleaned = array();
     foreach ($array as $k => $v) {
-        if (gettype($k) === 'string') {
+        if (is_string($k)) {
             $cleaned[$k] = $v;
         }
     }
