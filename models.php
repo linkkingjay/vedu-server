@@ -85,7 +85,7 @@ function get_tech_thens($id) {
 
     $query = $conn->prepare('SELECT * FROM Tech_then WHERE tech_id = :id');
     $query->bindValue(':id', $id);
-    $results = $query->exec();
+    $results = $query->execute();
 
     $thens = array();
     while ($result = $results->fetchArray()) {
@@ -108,7 +108,7 @@ function get_tech_links($id) {
 
     $query = $conn->prepare('SELECT * FROM Links WHERE tech_id = :id');
     $query->bindValue(':id', $id);
-    $results = $query->exec();
+    $results = $query->execute();
 
     $links = array();
     while ($result = $results->fetchArray()) {
