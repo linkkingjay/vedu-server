@@ -2,5 +2,6 @@
 
 require_once('config.inc');
 require_once('models.php');
+require_once('templates.php');
 
-echo 'haha!';
+echo $templates->render('index.html', array('name' => 'world'));
