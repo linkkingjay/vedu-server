@@ -1,2 +1,5 @@
 *db
 *swp
+
+templates/cache
+vendor/
