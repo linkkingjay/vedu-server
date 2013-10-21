@@ -19,22 +19,6 @@ function batch_bind_value($prepare, $items) {
 }
 
 /**
- * remove sql record array's integer index
- *
- * @param $array raw sql record array
- * @return record array
- */
-function clean_fetch_record($array) {
-    $cleaned = array();
-    foreach ($array as $k => $v) {
-        if (is_string($k)) {
-            $cleaned[$k] = $v;
-        }
-    }
-    return $cleaned;
-}
-
-/**
  * create a conn cursor
  *
  * XXX don't forget to close after using
@@ -60,11 +44,7 @@ function get_record_by_id($table, $primary_key, $id) {
     $query = $conn->prepare(
         'SELECT * FROM ' . $table . ' WHERE ' . $primary_key . ' = :id');
     $query->bindValue(':id', $id);
-    $result = $query->execute()->fetchArray();
-
-    if ($result){
-        $result = clean_fetch_record($result);
-    } 
+    $result = $query->execute()->fetchArray(SQLITE3_ASSOC);
     $conn->close();
 
     return $result;
@@ -82,8 +62,8 @@ function get_all_records($table) {
     $results = array();
     $query = $conn->query('SELECT * FROM ' . $table);
 
-    while ($result = $query->fetchArray()) {
-        $results[] = clean_fetch_record($result);
+    while ($result = $query->fetchArray(SQLITE3_ASSOC)) {
+        $results[] = $result;
     }
 
     $conn->close();
