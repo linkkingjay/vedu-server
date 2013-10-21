@@ -60,12 +60,11 @@ function get_record_by_id($table, $primary_key, $id) {
     $query = $conn->prepare(
         'SELECT * FROM ' . $table . ' WHERE ' . $primary_key . ' = :id');
     $query->bindValue(':id', $id);
-    $result = $query->execute();
+    $result = $query->execute()->fetchArray();
 
-    if ($result) {
-        $result = clean_fetch_record($result->fetchArray());
-    }
-
+    if ($result){
+        $result = clean_fetch_record($result);
+    } 
     $conn->close();
 
     return $result;
