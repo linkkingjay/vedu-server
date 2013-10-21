@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+        <input type="hidden" name="tech_id" value="{{tech_id}}"/>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <h1>Techs:</h1>
+    <ol>
+        {%for t in techs%}
+        <li>
+            <h2><a href="subject.php?id={{t.tech_id}}">{{t.name}}</a></h2>
+            <a href="remove_tech?id={{t.tech_id}}">remove</a>
+        </li>
+        {%endfor%}
+    </ol>
+</body>
+</html>

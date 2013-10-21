@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{name}}</title>
+</head>
+<body>
+    <h1>{{name}}</h1> 
+    <h2><a href="{{home}}">{{home}}</a></h2>
+    <p><b>description:</b>{{description}}</p>
+    <h3>relative techs:</h3>
+    <ul>
+        {%for t in thens%}
+        <li>
+            <a href="?id={{t.tech_id}}">{{t.name}}</a>
+            <a href="remove_then.php?tech_id={{tech_id}}&then_id={{t.tech_id}}">remove</a>
+        </li>
+        {%endfor%}
+    </ul>
+    <form method="post" action="post_then.php">
+        <input type="text" name="name" placeholder="new relative tech's name"/>
+        <input type="hidden" name="tech_id" value="{{tech_id}}"/>
+        <input type="submit" />
+    </form>
+    <h3>links:</h3>
+    <ul>
+        {%for l in links%}
+        <li>
+            <a href="{{l.url}}">{{l.name}}</a>
+            <a href="remove_link.php?link_id={{l.link_id}}">remove</a>
+        </li>
+        {%endfor%}
+    </ul>
+    <form method="post" action="post_link.php">
+        <input type="text" name="name" placeholder="new link's name"/>
+        <input type="text" name="url" placeholder="new link's url"/>
+        <input type="hidden" name="tech_id" value="{{tech_id}}"/>
+        <input type="submit" />
+    </form>
+</body>
+</html>
