@@ -12,6 +12,24 @@ function get_tech_by_id($id) {
     return get_record_by_id('Tech', 'tech_id', $id);
 }
 
+
+/**
+ * get a tech term by name
+ *
+ * @param $name tech term's name
+ * @return array if it was found otherwise NULL
+ */
+function get_tech_by_name($name) {
+    $conn = get_connection();
+
+    $query = $conn->prepare('SELECT * FROM Tech WHERE name = :name');
+    $query->bindValue(':name', $name);
+    $result = $query->execute()->fetchArray(SQLITE3_ASSOC);
+    $conn->close();
+    return $result;
+}
+
+
 /**
  * get all tech terms
  *
@@ -60,11 +78,11 @@ function remove_tech($id) {
 
     $remove = $conn->prepare('DELETE FROM Links WHERE tech_id = :id');
     $remove->bindValue(':id', $id);
-    $remove->exec();
+    $remove->execute();
     $remove = $conn->prepare('DELETE FROM Tech_then ' .
         'WHERE tech_id = :id OR then_id = :id');
     $remove->bindValue(':id', $id);
-    $remove->exec();
+    $remove->execute();
 
     $conn->close();
 
@@ -128,6 +146,23 @@ function get_tech_links($id) {
  * @return NULL
  * */
 function create_tech_then($from, $to) {
+    if ($from == $to) {
+        return false;
+    }
+
+    $conn = get_connection();
+
+    // SQLite3不能设置双主键，在插入前检查是否有这个关系存在，防止重复插入
+    $query = $conn->prepare('SELECT * FROM Tech_then WHERE tech_id = :tech_id AND then_id = :then_id');
+    $query->bindValue(':tech_id', $from);
+    $query->bindValue(':then_id', $to);
+    $result = $query->execute()->fetchArray();
+    $conn->close();
+
+    if ($result != null) {
+        return false;
+    }
+
     create_record('Tech_then', array(
         'tech_id' => $from,
         'then_id' => $to
@@ -150,7 +185,7 @@ function remove_tech_then($from, $to) {
         'from' => $from,
         'to' => $to
     ));
-    $remove->bindValue();
+    $remove->execute();
 
     $conn->close();
 }
