@@ -7,5 +7,6 @@ require_once(VENDOR_PATH . 'autoload.php');
 
 $loader = new Twig_Loader_Filesystem(TMPL_PATH);
 $templates = new Twig_Environment($loader, array(
-    'cache' => TMPL_PATH . 'cache'
+    'cache' => TMPL_PATH . 'cache',
+    'auto_reload' => true
 ));
